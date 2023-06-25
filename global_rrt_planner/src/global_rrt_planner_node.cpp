@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
 
     //costmap_2d::Costmap2DROS lcr("costmap", buffer);
 
-    global_rrt_planner::GlobalRRTPlanner planner("rrt_planner_move_base", "indires_rover/odom", &buffer);
+    global_rrt_planner::GlobalRRTPlanner planner("rrt_planner_move_base", "odom", &buffer);
 
     ros::spin();
     return 0;

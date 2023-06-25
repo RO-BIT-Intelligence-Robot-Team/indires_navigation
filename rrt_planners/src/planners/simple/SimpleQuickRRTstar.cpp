@@ -373,7 +373,7 @@ std::vector<RRT::Node> RRT::SimpleQuickRRTstar::solve(float secs)
 
   if (!solved && !exploration_)
   {
-    printf("\nRRT. Approximate solution found. dist to goal: %.3f\n", approxDist);
+    printf("\nRRT(1). Approximate solution found. dist to goal: %.3f\n", approxDist);
     solution = approxSolution;
   }
   else

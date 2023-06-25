@@ -23,7 +23,7 @@ class EventPublisher(object):
     def publish_waypoint_req(self):
        
         g = PoseStamped()
-        g.header.frame_id = 'indires_rover/odom'
+        g.header.frame_id = 'odom'
         g.header.stamp = rp.Time.now()
         g.pose.orientation.x = 0
         g.pose.orientation.y = 0

@@ -18,7 +18,7 @@
 		<!-- frequency of the macro actions -->
 		<param name="control_frequency" value="15.0" />
 
-		<param name="odom_topic" value="indires_rover/odom" />
+		<param name="odom_topic" value="odom" />
 
 	</node>
 

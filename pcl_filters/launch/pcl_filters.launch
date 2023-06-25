@@ -1,10 +1,10 @@
 <!-- -->
 <launch>
 
-	<arg name="pointcloud" default="point_map" /> <!--/rtabmap/cloud_map   point_map -->
-	<arg name="prefix" default="indires_rover" />
-	<arg name="robot_topic" default="/$(arg prefix)/odom_filtered" />
-	<arg name="sensor_frame" default="$(arg prefix)/front_rgbd_camera/depth_optical_frame" />
+	<arg name="pointcloud" default="globalmap" /> <!--/rtabmap/cloud_map   point_map -->
+	<arg name="prefix" default="" />
+	<arg name="robot_topic" default="/odom" />
+	<arg name="sensor_frame" default="velodyne" />
 
 	<!-- launch-prefix="xterm -e gdb (doble hyphen)args"-->
 	 <node pkg="pcl_filters" type="pcl_filters_node" name="pcl_filters_node_1" output="screen" >
@@ -13,7 +13,7 @@
 		<param name="output_topic" value="rrt_pointcloud_samples" />
 		<param name="use_robot_pose" value="true" />
 		<param name="robot_pose_topic" value="$(arg robot_topic)" />
-		<param name="odom_frame" value="$(arg prefix)/odom" /> <!--the output pointcloud is published in this frame-->
+		<param name="odom_frame" value="odom" /> <!--the output pointcloud is published in this frame-->
 		<param name="sensor_frame" value="$(arg sensor_frame)" />
 		<param name="local_grid_radius" value="5.0" /> <!--5.0  for nfe,bfe: 12.0-->
 
@@ -36,7 +36,7 @@
 		<param name="output_topic" value="features_pointcloud" />
 		<param name="use_robot_pose" value="true" />
 		<param name="robot_pose_topic" value="$(arg robot_topic)" />
-		<param name="odom_frame" value="$(arg prefix)/odom" /> <!--"indires_rover/odom"-->
+		<param name="odom_frame" value="odom" /> <!--"indires_rover/odom"-->
 		<param name="local_grid_radius" value="5.0" /> <!--5.0  for nfe,bfe: 12.0-->
 
 		<param name="filter_ceiling" value="false" />
@@ -54,7 +54,7 @@
 		<param name="output_topic" value="local_control_pointcloud" />
 		<param name="use_robot_pose" value="true" />
 		<param name="robot_pose_topic" value="$(arg robot_topic)" />
-		<param name="odom_frame" value="$(arg prefix)/odom" /> <!--"indires_rover/odom"-->
+		<param name="odom_frame" value="odom" /> <!--"indires_rover/odom"-->
 		<param name="local_grid_radius" value="1.6" />
 
 		<param name="filter_ceiling" value="false" />
@@ -73,7 +73,7 @@
 		<param name="publish_topic" value="false" />
 		<param name="use_robot_pose" value="true" />
 		<param name="robot_pose_topic" value="$(arg robot_topic)" />
-		<param name="odom_frame" value="$(arg prefix)/odom" /> <!--"indires_rover/odom"-->
+		<param name="odom_frame" value="odom" /> <!--"indires_rover/odom"-->
 		<param name="local_grid_radius" value="7.0" /> <!--7.0  for nfe,bfe: 14.0-->
 
 		<param name="filter_ceiling" value="false" />

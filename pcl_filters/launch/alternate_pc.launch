@@ -2,7 +2,7 @@
 
 <launch>
 
-    <arg name="prefix" default="indires_rover"/>
+    <arg name="prefix" default=""/>
 
 	<node name="alternate_pc_node" pkg="pcl_filters" type="alternate_pc_node" output="screen">
 

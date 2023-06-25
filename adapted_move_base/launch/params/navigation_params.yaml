@@ -25,8 +25,8 @@ clearing_rotation_allowed:  false
 shutdown_costmaps:          false
 oscillation_timeout:        0.0
 oscillation_distance:       0.5
-global_costmap/robot_base_frame:  indires_rover/base_link
-global_costmap/global_frame:      indires_rover/odom
+global_costmap/robot_base_frame:  base_link
+global_costmap/global_frame:      odom
 
 # parameters added to use costmaps or not
 use_global_costmap2d:       false
@@ -94,10 +94,10 @@ RRT_ros_wrapper:
   
   features_name:              navigation_features_3d
 
-  planning_frame:             indires_rover/odom
-  robot_base_frame:           indires_rover/base_link
-  robot_odom_frame:           indires_rover/odom
-  robot_pc_sensor_frame:      indires_rover/front_rgbd_camera/depth_optical_frame
+  planning_frame:             odom
+  robot_base_frame:           base_link
+  robot_odom_frame:           odom
+  robot_pc_sensor_frame:      velodyne
 
 
   #if the planner is kinodynamic (options 3 and 4)
@@ -175,9 +175,9 @@ navigation_features_3d:
   max_roughness:              0.8 #0.15 #0.8
   min_points_allowed:         12 #18 #20
 
-  robot_base_frame:           indires_rover/base_link
-  robot_odom_frame:           indires_rover/odom
-  robot_odom_topic:           indires_rover/odom_filtered  #icp_odom
+  robot_base_frame:           base_link
+  robot_odom_frame:           odom
+  robot_odom_topic:           odom  #icp_odom
   
   feature_set:                2
   
@@ -275,9 +275,9 @@ Local3DPlannerROS:
   robot_radius:               0.42
   local_area_radius:          1.5 #1.2
  
-  odometry_topic:             indires_rover/odom_filtered
-  base_frame:                 indires_rover/base_link
-  global_frame:               indires_rover/odom
+  odometry_topic:             odom
+  base_frame:                 base_link
+  global_frame:               odom
 
 
   # if a laser range finder is employed
@@ -313,8 +313,8 @@ local_features_3d:
   max_roughness:              5.0  #0.15 #0.8
   min_points_allowed:         15   #20
 
-  robot_base_frame:           indires_rover/base_link
-  robot_odom_frame:           indires_rover/odom
-  robot_odom_topic:           indires_rover/odom_filtered  
+  robot_base_frame:           base_link
+  robot_odom_frame:           odom
+  robot_odom_topic:           odom
 
   

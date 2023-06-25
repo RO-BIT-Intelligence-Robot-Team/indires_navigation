@@ -34,12 +34,12 @@
 *
 * Author: Eitan Marder-Eppstein
 *         Mike Phillips (put the planner in its own thread)
-* 
+*
 * MODIFIED VERSION:
 * Version modified with the aim of using planners that do not use
 * costmap2d of ROS.
 * Author: Noé Pérez-Higueras
-* 
+*
 *********************************************************************/
 #include <adapted_move_base/move_base.h>
 #include <cmath>
@@ -60,7 +60,7 @@ namespace move_base {
     as_(NULL),
     planner_costmap_ros_(NULL), controller_costmap_ros_(NULL),
     bgp_loader_("nav_core", "nav_core::BaseGlobalPlanner"),
-    blp_loader_("nav_core", "nav_core::BaseLocalPlanner"), 
+    blp_loader_("nav_core", "nav_core::BaseLocalPlanner"),
     recovery_loader_("nav_core", "nav_core::RecoveryBehavior"),
     planner_plan_(NULL), latest_plan_(NULL), controller_plan_(NULL),
     runPlanner_(false), setup_(false), p_freq_change_(false), c_freq_change_(false), new_global_plan_(false) {
@@ -86,7 +86,7 @@ namespace move_base {
 
     private_nh.param("oscillation_timeout", oscillation_timeout_, 0.0);
     private_nh.param("oscillation_distance", oscillation_distance_, 0.5);
-    
+
     //New parameters
     private_nh.param("use_global_costmap2d", use_global_costmap2d_, false);
     private_nh.param("use_local_costmap2d", use_local_costmap2d_, false);
@@ -125,10 +125,10 @@ namespace move_base {
 
     //create the ros wrapper for the planner's costmap... and initializer a pointer we'll use with the underlying map
     if(use_global_costmap2d_) {
-		planner_costmap_ros_ = new costmap_2d::Costmap2DROS("global_costmap", tf_);
-		planner_costmap_ros_->pause();
-	}
-	
+    planner_costmap_ros_ = new costmap_2d::Costmap2DROS("global_costmap", tf_);
+    planner_costmap_ros_->pause();
+  }
+
     //initialize the global planner
     try {
       planner_ = bgp_loader_.createInstance(global_planner);
@@ -140,9 +140,9 @@ namespace move_base {
 
     //create the ros wrapper for the controller's costmap... and initializer a pointer we'll use with the underlying map
     if(use_local_costmap2d_) {
-		controller_costmap_ros_ = new costmap_2d::Costmap2DROS("local_costmap", tf_);
-		controller_costmap_ros_->pause();
-	}
+    controller_costmap_ros_ = new costmap_2d::Costmap2DROS("local_costmap", tf_);
+    controller_costmap_ros_->pause();
+  }
     //create a local planner
     try {
       tc_ = blp_loader_.createInstance(local_planner);
@@ -192,7 +192,7 @@ namespace move_base {
 
   void MoveBase::reconfigureCB(move_base::MoveBaseConfig &config, uint32_t level){
     boost::recursive_mutex::scoped_lock l(configuration_mutex_);
-	//std::recursive_mutex::scoped_lock l(configuration_mutex_);
+  //std::recursive_mutex::scoped_lock l(configuration_mutex_);
 
     //The first time we're called, we just want to make sure we have the
     //original configuration
@@ -264,7 +264,7 @@ namespace move_base {
     if(config.base_local_planner != last_config_.base_local_planner){
       boost::shared_ptr<nav_core::BaseLocalPlanner> old_planner = tc_;
       //std::shared_ptr<nav_core::BaseLocalPlanner> old_planner = tc_;
-      
+
       //create a local planner
       try {
         tc_ = blp_loader_.createInstance(config.base_local_planner);
@@ -351,25 +351,25 @@ namespace move_base {
 
   bool MoveBase::clearCostmapsService(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp){
     //clear the costmaps
-    
+
     if(use_local_costmap2d_) {
-		boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock_controller(*(controller_costmap_ros_->getCostmap()->getMutex()));
-		//std::unique_lock<costmap_2d::Costmap2D::mutex_t> lock_controller(*(controller_costmap_ros_->getCostmap()->getMutex()));
-		controller_costmap_ros_->resetLayers();
-	}
-	if(use_global_costmap2d_) {
-		boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock_planner(*(planner_costmap_ros_->getCostmap()->getMutex()));
-		//std::unique_lock<costmap_2d::Costmap2D::mutex_t> lock_planner(*(planner_costmap_ros_->getCostmap()->getMutex()));
-		planner_costmap_ros_->resetLayers();
-	}
+    boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock_controller(*(controller_costmap_ros_->getCostmap()->getMutex()));
+    //std::unique_lock<costmap_2d::Costmap2D::mutex_t> lock_controller(*(controller_costmap_ros_->getCostmap()->getMutex()));
+    controller_costmap_ros_->resetLayers();
+  }
+  if(use_global_costmap2d_) {
+    boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock_planner(*(planner_costmap_ros_->getCostmap()->getMutex()));
+    //std::unique_lock<costmap_2d::Costmap2D::mutex_t> lock_planner(*(planner_costmap_ros_->getCostmap()->getMutex()));
+    planner_costmap_ros_->resetLayers();
+  }
     return true;
   }
 
 
   bool MoveBase::planService(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::Response &resp){
-	  
-	printf("\nAdaptedMoveBase. planService called\n\n");
-	  
+
+  printf("\nAdaptedMoveBase. planService called\n\n");
+
     if(as_->isActive()){
       ROS_ERROR("move_base must be in an inactive state to make a plan for an external user");
       return false;
@@ -396,15 +396,15 @@ namespace move_base {
         start = req.start;
     }
 
-	if(use_global_costmap2d_) {
-		//update the copy of the costmap the planner uses
-		clearCostmapWindows(2 * clearing_radius_, 2 * clearing_radius_);
-	}
+  if(use_global_costmap2d_) {
+    //update the copy of the costmap the planner uses
+    clearCostmapWindows(2 * clearing_radius_, 2 * clearing_radius_);
+  }
 
     //first try to make a plan to the exact desired goal
     std::vector<geometry_msgs::PoseStamped> global_plan;
     if(!planner_->makePlan(start, req.goal, global_plan) || global_plan.empty()){
-      ROS_DEBUG_NAMED("move_base","Failed to find a plan to exact goal of (%.2f, %.2f), searching for a feasible goal within tolerance", 
+      ROS_DEBUG_NAMED("move_base","Failed to find a plan to exact goal of (%.2f, %.2f), searching for a feasible goal within tolerance",
           req.goal.pose.position.x, req.goal.pose.position.y);
 
       //search outwards for a feasible goal within the specified tolerance
@@ -412,59 +412,59 @@ namespace move_base {
       p = req.goal;
       bool found_legal = false;
       float resolution = 0.05;
-      if(use_global_costmap2d_) 
+      if(use_global_costmap2d_)
       {
-		  resolution = planner_costmap_ros_->getCostmap()->getResolution();
-		  float search_increment = resolution*3.0;
-		  if(req.tolerance > 0.0 && req.tolerance < search_increment) search_increment = req.tolerance;
-		  for(float max_offset = search_increment; max_offset <= req.tolerance && !found_legal; max_offset += search_increment) {
-			for(float y_offset = 0; y_offset <= max_offset && !found_legal; y_offset += search_increment) {
-			  for(float x_offset = 0; x_offset <= max_offset && !found_legal; x_offset += search_increment) {
+      resolution = planner_costmap_ros_->getCostmap()->getResolution();
+      float search_increment = resolution*3.0;
+      if(req.tolerance > 0.0 && req.tolerance < search_increment) search_increment = req.tolerance;
+      for(float max_offset = search_increment; max_offset <= req.tolerance && !found_legal; max_offset += search_increment) {
+      for(float y_offset = 0; y_offset <= max_offset && !found_legal; y_offset += search_increment) {
+        for(float x_offset = 0; x_offset <= max_offset && !found_legal; x_offset += search_increment) {
 
-				//don't search again inside the current outer layer
-				if(x_offset < max_offset-1e-9 && y_offset < max_offset-1e-9) continue;
+        //don't search again inside the current outer layer
+        if(x_offset < max_offset-1e-9 && y_offset < max_offset-1e-9) continue;
 
-				//search to both sides of the desired goal
-				for(float y_mult = -1.0; y_mult <= 1.0 + 1e-9 && !found_legal; y_mult += 2.0) {
+        //search to both sides of the desired goal
+        for(float y_mult = -1.0; y_mult <= 1.0 + 1e-9 && !found_legal; y_mult += 2.0) {
 
-				  //if one of the offsets is 0, -1*0 is still 0 (so get rid of one of the two)
-				  if(y_offset < 1e-9 && y_mult < -1.0 + 1e-9) continue;
+          //if one of the offsets is 0, -1*0 is still 0 (so get rid of one of the two)
+          if(y_offset < 1e-9 && y_mult < -1.0 + 1e-9) continue;
 
-				  for(float x_mult = -1.0; x_mult <= 1.0 + 1e-9 && !found_legal; x_mult += 2.0) {
-					if(x_offset < 1e-9 && x_mult < -1.0 + 1e-9) continue;
+          for(float x_mult = -1.0; x_mult <= 1.0 + 1e-9 && !found_legal; x_mult += 2.0) {
+          if(x_offset < 1e-9 && x_mult < -1.0 + 1e-9) continue;
 
-					p.pose.position.y = req.goal.pose.position.y + y_offset * y_mult;
-					p.pose.position.x = req.goal.pose.position.x + x_offset * x_mult;
+          p.pose.position.y = req.goal.pose.position.y + y_offset * y_mult;
+          p.pose.position.x = req.goal.pose.position.x + x_offset * x_mult;
 
-					if(planner_->makePlan(start, p, global_plan)){
-					  if(!global_plan.empty()){
+          if(planner_->makePlan(start, p, global_plan)){
+            if(!global_plan.empty()){
 
-						//adding the (unreachable) original goal to the end of the global plan, in case the local planner can get you there
-						//(the reachable goal should have been added by the global planner)
-						global_plan.push_back(req.goal);
+            //adding the (unreachable) original goal to the end of the global plan, in case the local planner can get you there
+            //(the reachable goal should have been added by the global planner)
+            global_plan.push_back(req.goal);
 
-						found_legal = true;
-						ROS_DEBUG_NAMED("move_base", "Found a plan to point (%.2f, %.2f)", p.pose.position.x, p.pose.position.y);
-						break;
-					  }
-					}
-					else{
-					  ROS_DEBUG_NAMED("move_base","Failed to find a plan to point (%.2f, %.2f)", p.pose.position.x, p.pose.position.y);
-					}
-				  }
-				}
-			  }
-			}
-		  }
-	  } else {
-			if(planner_->makePlan(start, p, global_plan)){
-				if(!global_plan.empty()){
-					global_plan.push_back(req.goal);
-					ROS_DEBUG_NAMED("move_base", "Found a plan to point (%.2f, %.2f)", p.pose.position.x, p.pose.position.y);
-				} else
-					ROS_DEBUG_NAMED("move_base","Failed to find a plan to point (%.2f, %.2f)", p.pose.position.x, p.pose.position.y);
-			}
-		}
+            found_legal = true;
+            ROS_DEBUG_NAMED("move_base", "Found a plan to point (%.2f, %.2f)", p.pose.position.x, p.pose.position.y);
+            break;
+            }
+          }
+          else{
+            ROS_DEBUG_NAMED("move_base","Failed to find a plan to point (%.2f, %.2f)", p.pose.position.x, p.pose.position.y);
+          }
+          }
+        }
+        }
+      }
+      }
+    } else {
+      if(planner_->makePlan(start, p, global_plan)){
+        if(!global_plan.empty()){
+          global_plan.push_back(req.goal);
+          ROS_DEBUG_NAMED("move_base", "Found a plan to point (%.2f, %.2f)", p.pose.position.x, p.pose.position.y);
+        } else
+          ROS_DEBUG_NAMED("move_base","Failed to find a plan to point (%.2f, %.2f)", p.pose.position.x, p.pose.position.y);
+      }
+    }
     }
 
     //copy the plan into a message to send out
@@ -507,12 +507,12 @@ namespace move_base {
 
 
   bool MoveBase::makePlan(const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan){
-	
-	if(use_global_costmap2d_)  {
-		boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(planner_costmap_ros_->getCostmap()->getMutex()));
-		//std::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(planner_costmap_ros_->getCostmap()->getMutex()));
-	}
-	
+
+  if(use_global_costmap2d_)  {
+    boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(planner_costmap_ros_->getCostmap()->getMutex()));
+    //std::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(planner_costmap_ros_->getCostmap()->getMutex()));
+  }
+
     //make sure to set the plan to be empty initially
     plan.clear();
 
@@ -580,11 +580,11 @@ namespace move_base {
   }
 
   geometry_msgs::PoseStamped MoveBase::goalToGlobalFrame(const geometry_msgs::PoseStamped& goal_pose_msg){
-	  
+
     std::string global_frame = global_frame_;
     if(use_global_costmap2d_)
-		global_frame = planner_costmap_ros_->getGlobalFrameID();
-		
+    global_frame = planner_costmap_ros_->getGlobalFrameID();
+
     geometry_msgs::PoseStamped goal_pose, global_pose;
     goal_pose = goal_pose_msg;
 
@@ -707,27 +707,27 @@ namespace move_base {
       return;
     }
 
-	geometry_msgs::PoseStamped goal = move_base_goal->target_pose;
-	if(!(move_base_goal->target_pose.header.frame_id).empty()) {
-		ROS_INFO("executeCb. Goal received with empty frame - passing to EXPLORATION");
-		geometry_msgs::PoseStamped goal = goalToGlobalFrame(move_base_goal->target_pose);
-	}
+  geometry_msgs::PoseStamped goal = move_base_goal->target_pose;
+  if(!(move_base_goal->target_pose.header.frame_id).empty()) {
+    ROS_INFO("executeCb. Goal received with empty frame - passing to EXPLORATION");
+    geometry_msgs::PoseStamped goal = goalToGlobalFrame(move_base_goal->target_pose);
+  }
     //we have a goal so start the planner
     boost::unique_lock<boost::recursive_mutex> lock(planner_mutex_);
     //std::unique_lock<std::recursive_mutex> lock(planner_mutex_);
-    
+
     planner_goal_ = goal;
     runPlanner_ = true;
     planner_cond_.notify_one();
     lock.unlock();
 
-	if(!goal.header.frame_id.empty())
-		current_goal_pub_.publish(goal);
-		
+  if(!goal.header.frame_id.empty())
+    current_goal_pub_.publish(goal);
+
     std::vector<geometry_msgs::PoseStamped> global_plan;
 
     ros::Rate r(controller_frequency_);
-   
+
     if(shutdown_costmaps_){
       ROS_DEBUG_NAMED("move_base","Starting up costmaps that were shut down previously");
       if(use_global_costmap2d_)	planner_costmap_ros_->start();
@@ -760,10 +760,10 @@ namespace move_base {
             return;
           }
 
-		  if(!(new_goal.target_pose.header.frame_id).empty())
-				goal = goalToGlobalFrame(new_goal.target_pose);
-		  else 
-				goal = new_goal.target_pose;
+      if(!(new_goal.target_pose.header.frame_id).empty())
+        goal = goalToGlobalFrame(new_goal.target_pose);
+      else
+        goal = new_goal.target_pose;
 
           //we'll make sure that we reset our state for the next execution cycle
           recovery_index_ = 0;
@@ -776,13 +776,13 @@ namespace move_base {
           planner_cond_.notify_one();
           lock.unlock();
 
-		  if(!goal.header.frame_id.empty())
-		  {
-			  //publish the goal point to the visualizer
-			  ROS_DEBUG_NAMED("move_base","move_base has received a goal of x: %.2f, y: %.2f", goal.pose.position.x, goal.pose.position.y);
-			  ROS_INFO("move_base has received a goal of x: %.2f, y: %.2f", goal.pose.position.x, goal.pose.position.y);
-			  current_goal_pub_.publish(goal);
-		  }
+      if(!goal.header.frame_id.empty())
+      {
+        //publish the goal point to the visualizer
+        ROS_DEBUG_NAMED("move_base","move_base has received a goal of x: %.2f, y: %.2f", goal.pose.position.x, goal.pose.position.y);
+        ROS_INFO("move_base has received a goal of x: %.2f, y: %.2f", goal.pose.position.x, goal.pose.position.y);
+        current_goal_pub_.publish(goal);
+      }
 
           //make sure to reset our timeouts and counters
           last_valid_control_ = ros::Time::now();
@@ -796,7 +796,7 @@ namespace move_base {
 
           //notify the ActionServer that we've successfully preempted
           ROS_DEBUG_NAMED("move_base","Move base preempting the current goal");
-		  ROS_INFO("Move base preempting the current goal");
+      ROS_INFO("Move base preempting the current goal");
           as_->setPreempted();
 
           //we'll actually return from execute after preempting
@@ -821,14 +821,14 @@ namespace move_base {
         planner_cond_.notify_one();
         lock.unlock();
 
-		if(!goal.header.frame_id.empty())
-		{
-			//publish the goal point to the visualizer
-			ROS_DEBUG_NAMED("move_base","The global frame for move_base has changed, new frame: %s, new goal position x: %.2f, y: %.2f", goal.header.frame_id.c_str(), goal.pose.position.x, goal.pose.position.y);
-			ROS_INFO("The global frame for move_base has changed, new frame: %s, new goal position x: %.2f, y: %.2f", goal.header.frame_id.c_str(), goal.pose.position.x, goal.pose.position.y);
-			current_goal_pub_.publish(goal);
-		}
-		
+    if(!goal.header.frame_id.empty())
+    {
+      //publish the goal point to the visualizer
+      ROS_DEBUG_NAMED("move_base","The global frame for move_base has changed, new frame: %s, new goal position x: %.2f, y: %.2f", goal.header.frame_id.c_str(), goal.pose.position.x, goal.pose.position.y);
+      ROS_INFO("The global frame for move_base has changed, new frame: %s, new goal position x: %.2f, y: %.2f", goal.header.frame_id.c_str(), goal.pose.position.x, goal.pose.position.y);
+      current_goal_pub_.publish(goal);
+    }
+
         //make sure to reset our timeouts and counters
         last_valid_control_ = ros::Time::now();
         last_valid_plan_ = ros::Time::now();
@@ -884,7 +884,7 @@ namespace move_base {
   bool MoveBase::executeCycle(geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& global_plan){
     boost::recursive_mutex::scoped_lock ecl(configuration_mutex_);
     //std::recursive_mutex::scoped_lock ecl(configuration_mutex_);
-    
+
     //we need to be able to publish velocity commands
     geometry_msgs::Twist cmd_vel;
 
@@ -904,20 +904,20 @@ namespace move_base {
       last_oscillation_reset_ = ros::Time::now();
       oscillation_pose_ = current_position;
 
-      //if our last recovery was caused by oscillation, we want to reset the recovery index 
+      //if our last recovery was caused by oscillation, we want to reset the recovery index
       if(recovery_trigger_ == OSCILLATION_R)
         recovery_index_ = 0;
     }
 
-	if(use_local_costmap2d_)
-	{
-		//check that the observation buffers for the costmap are current, we don't want to drive blind
-		if(!controller_costmap_ros_->isCurrent()){
-		  ROS_WARN("[%s]:Sensor data is out of date, we're not going to allow commanding of the base for safety",ros::this_node::getName().c_str());
-		  publishZeroVelocity();
-		  return false;
-		}
-	}
+  if(use_local_costmap2d_)
+  {
+    //check that the observation buffers for the costmap are current, we don't want to drive blind
+    if(!controller_costmap_ros_->isCurrent()){
+      ROS_WARN("[%s]:Sensor data is out of date, we're not going to allow commanding of the base for safety",ros::this_node::getName().c_str());
+      publishZeroVelocity();
+      return false;
+    }
+  }
 
     //if we have a new plan then grab it and give it to the controller
     if(new_global_plan_){
@@ -1000,13 +1000,13 @@ namespace move_base {
           state_ = CLEARING;
           recovery_trigger_ = OSCILLATION_R;
         }
-        
+
         //{
         if(use_local_costmap2d_) {
-			boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(controller_costmap_ros_->getCostmap()->getMutex()));
-			//std::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(controller_costmap_ros_->getCostmap()->getMutex()));
-        } 
-			
+      boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(controller_costmap_ros_->getCostmap()->getMutex()));
+      //std::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(controller_costmap_ros_->getCostmap()->getMutex()));
+        }
+
         if(tc_->computeVelocityCommands(cmd_vel)){
           ROS_DEBUG_NAMED( "move_base", "Got a valid command from the local planner: %.3lf, %.3lf, %.3lf",
                            cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.angular.z );
@@ -1128,7 +1128,7 @@ namespace move_base {
                     std::string name_i = behavior_list[i]["name"];
                     std::string name_j = behavior_list[j]["name"];
                     if(name_i == name_j){
-                      ROS_ERROR("A recovery behavior with the name %s already exists, this is not allowed. Using the default recovery behaviors instead.", 
+                      ROS_ERROR("A recovery behavior with the name %s already exists, this is not allowed. Using the default recovery behaviors instead.",
                           name_i.c_str());
                       return false;
                     }
@@ -1166,7 +1166,7 @@ namespace move_base {
             }
 
             boost::shared_ptr<nav_core::RecoveryBehavior> behavior(recovery_loader_.createInstance(behavior_list[i]["type"]));
-			//std::shared_ptr<nav_core::RecoveryBehavior> behavior(recovery_loader_.createInstance(behavior_list[i]["type"]));
+      //std::shared_ptr<nav_core::RecoveryBehavior> behavior(recovery_loader_.createInstance(behavior_list[i]["type"]));
 
             //shouldn't be possible, but it won't hurt to check
             if(behavior.get() == NULL){
@@ -1185,7 +1185,7 @@ namespace move_base {
         }
       }
       else{
-        ROS_ERROR("The recovery behavior specification must be a list, but is of XmlRpcType %d. We'll use the default recovery behaviors instead.", 
+        ROS_ERROR("The recovery behavior specification must be a list, but is of XmlRpcType %d. We'll use the default recovery behaviors instead.",
             behavior_list.getType());
         return false;
       }
@@ -1274,13 +1274,13 @@ namespace move_base {
     // get robot pose on the given costmap frame
     try
     {
-		if(use_global_costmap2d_) {
-			global_pose = tf_.transform(robot_pose, costmap->getGlobalFrameID()); 
-			//tf_->transformPose(costmap->getGlobalFrameID(), robot_pose, global_pose);
-		} else {
-			global_pose = tf_.transform(robot_pose, global_frame_);
-			//tf_->transformPose(global_frame_, robot_pose, global_pose);
-		}
+    if(use_global_costmap2d_) {
+      global_pose = tf_.transform(robot_pose, costmap->getGlobalFrameID());
+      //tf_->transformPose(costmap->getGlobalFrameID(), robot_pose, global_pose);
+    } else {
+      global_pose = tf_.transform(robot_pose, global_frame_);
+      //tf_->transformPose(global_frame_, robot_pose, global_pose);
+    }
     }
     catch (tf2::LookupException& ex)
     {
@@ -1298,18 +1298,18 @@ namespace move_base {
       return false;
     }
 
-	/*if(use_global_costmap2d_) 
-	{
-		// check if global_pose time stamp is within costmap transform tolerance
-		if (current_time.toSec() - global_pose.header.stamp.toSec() > costmap->getTransformTolerance())
-		{
-		  ROS_WARN_THROTTLE(1.0, "Transform timeout for %s. " \
-							"Current time: %.4f, pose stamp: %.4f, tolerance: %.4f", costmap->getName().c_str(),
-							current_time.toSec(), global_pose.header.stamp.toSec(), costmap->getTransformTolerance());
-		  return false;
-		}
-	}*/
-	
+  /*if(use_global_costmap2d_)
+  {
+    // check if global_pose time stamp is within costmap transform tolerance
+    if (current_time.toSec() - global_pose.header.stamp.toSec() > costmap->getTransformTolerance())
+    {
+      ROS_WARN_THROTTLE(1.0, "Transform timeout for %s. " \
+              "Current time: %.4f, pose stamp: %.4f, tolerance: %.4f", costmap->getName().c_str(),
+              current_time.toSec(), global_pose.header.stamp.toSec(), costmap->getTransformTolerance());
+      return false;
+    }
+  }*/
+
     return true;
   }
 };

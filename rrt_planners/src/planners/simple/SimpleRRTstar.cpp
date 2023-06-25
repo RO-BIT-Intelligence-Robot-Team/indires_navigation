@@ -284,7 +284,7 @@ std::vector<RRT::Node> RRT::SimpleRRTstar::solve(float secs)
 
   if (!solved && !exploration_)
   {
-    printf("\nRRT. Approximate solution found. dist to goal: %.3f\n", approxDist);
+    printf("\nRRT(3). Approximate solution found. dist to goal: %.3f\n", approxDist);
     solution = approxSolution;
   }
   else
@@ -324,22 +324,34 @@ std::vector<RRT::Node> RRT::SimpleRRTstar::solve(float secs)
 
   if (!exploration_)
     solution.getState()->setYaw(goal_->getYaw());
+
+  std::cout<<"x : "<<goal_->getX()<<"   y : "<<goal_->getY()<<"   z : "<<goal_->getZ()<<std::endl;
   Node* current = &solution;
   path_cost_ = current->getAccCost();
   if (path_cost_ == 0)
     printf("\n----------SimpleRRTStar. path_cost = 0!!!!-------------\n");
   else
-    printf("Path cost: %.4f\n", path_cost_);
+    printf("Path cost??????: %.4f\n", path_cost_);
 
-
+  std::cout<<"---------------test1---------------"<<std::endl;
   while (current != NULL)
   {
+    std::cout<<"test2 : "<<current->getCost()<<std::endl;
+    std::cout<<"test2 : "<<current->getState()<<std::endl;
+    std::cout<<"test2 : "<<current->getAction()<<std::endl;
+    std::cout<<"test2 : "<<current->getParent()<<std::endl;
+    std::cout<<"test2 : "<<current->getAccCost()<<std::endl;
     Node node = *current;
+    std::cout<<"---------------test2-1---------------"<<std::endl;
     // copyNode(&node, current);
     path.push_back(node);
+    std::cout<<"---------------test2-2---------------"<<std::endl;
     current = current->getParent();
+    std::cout<<"---------------test2-3---------------"<<std::endl;
     path_nodes++;
+    std::cout<<"---------------test2-4---------------"<<std::endl;
   }
+  std::cout<<"---------------test3---------------"<<std::endl;
 
   stats_.planning_time = time;
   stats_.first_sol_time = first_sol_time;
@@ -352,12 +364,14 @@ std::vector<RRT::Node> RRT::SimpleRRTstar::solve(float secs)
 
 
   delete current;
+  std::cout<<"---------------test4---------------"<<std::endl;
   // delete ini;
   if (!exploration_)
     delete goalNode;
   // delete solution;
   // delete approxSolution;
 
+std::cout<<"---------------test5---------------"<<std::endl;
   // freeTreeMemory();
   // first_path_.clear();
 

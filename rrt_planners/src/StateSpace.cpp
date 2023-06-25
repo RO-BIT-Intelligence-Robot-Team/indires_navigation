@@ -311,7 +311,7 @@ RRT::State* RRT::StateSpace::sampleStateExternal()
   }
   else
   {
-    printf("StateSpace. External samples is empty!!!!!");
+    //printf("StateSpace. External samples is empty!!!!!");
     ext_mutex_.unlock();
     return new State();
   }

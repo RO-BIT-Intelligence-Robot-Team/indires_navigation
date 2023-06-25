@@ -84,10 +84,10 @@ RRT_ros_wrapper:
   
   features_name:              navigation_features_3d
 
-  planning_frame:             indires_rover/odom
-  robot_base_frame:           indires_rover/base_link
-  robot_odom_frame:           indires_rover/odom
-  robot_pc_sensor_frame:      indires_rover/front_rgbd_camera/depth_optical_frame
+  planning_frame:             odom
+  robot_base_frame:           base_link
+  robot_odom_frame:           odom
+  robot_pc_sensor_frame:      velodyne
 
 
   #if the planner is kinodynamic (options 3 and 4)
@@ -165,9 +165,9 @@ navigation_features_3d:
   max_roughness:              0.8 #0.15 #0.8
   min_points_allowed:         12 #18 #20
 
-  robot_base_frame:           indires_rover/base_link
-  robot_odom_frame:           indires_rover/odom
-  robot_odom_topic:           indires_rover/odom_filtered  #icp_odom
+  robot_base_frame:           base_link
+  robot_odom_frame:           odom
+  robot_odom_topic:           odom  #icp_odom
   
   feature_set:                2
   
